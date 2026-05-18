@@ -9,6 +9,12 @@ find_package(glfw3 REQUIRED)
 
 add_executable(minecart
     src/main.cpp
+
+    src/Bezier.h
+    src/Bezier.cpp
+
+    src/ParamCubeCurve.h
+    src/ParamCubeCurve.cpp
 )
 
 target_link_libraries(minecart
