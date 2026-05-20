@@ -17,8 +17,11 @@ add_executable(minecart
     src/ParamCubeCurve.cpp
 )
 
-target_link_libraries(minecart
-    PRIVATE
-        glfw
-        OpenGL::GL
+target_link_libraries(minecart PRIVATE
+    glfw
+    OpenGL::GL
+)
+
+target_include_directories(minecart PRIVATE
+    external/glad/include
 )

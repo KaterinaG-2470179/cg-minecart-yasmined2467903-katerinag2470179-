@@ -1,8 +1,12 @@
+#define GLAD_GL_IMPLEMENTATION
+#define GLFW_INCLUDE_NONE
+#include <glad/gl.h>
 #include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <iostream>
 
 #include "Bezier.h"
 
@@ -41,6 +45,11 @@ int main() {
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     glfwSetCursorPosCallback(window, mouse_callback);
+
+    if(!gladLoadGL(glfwGetProcAddress)) {
+        std::cerr << "Failed to init GLAD" << std::endl;
+        return -1;
+    }
 
     Bezier bezier(
         glm::vec3(-3, 0, 0),
@@ -85,10 +94,6 @@ int main() {
             glm::vec3 p = bezier.GetPoint(i);
             glVertex3f(p.x, p.y, p.z);
         }
-        glEnd();
-
-        glfwSwapBuffers(window);
-        glfwPollEvents();
 
     }
 
@@ -122,7 +127,7 @@ void processInput(GLFWwindow *window)
 
 void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 {
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) != GLFW_PRESS)
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) != GLFW_PRESS)
     {
         firstMouse = true;
         return;
