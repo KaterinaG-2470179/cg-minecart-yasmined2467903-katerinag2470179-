@@ -18,9 +18,6 @@ add_executable(minecart
 
     src/Camera.h
     src/Camera.cpp
-
-    shaders/fragment.glsl
-    shaders/vertex.glsl
 )
 
 target_link_libraries(minecart PRIVATE
@@ -30,4 +27,6 @@ target_link_libraries(minecart PRIVATE
 
 target_include_directories(minecart PRIVATE
     external/glad/include
+    external/stb_image
+    shaders/
 )
