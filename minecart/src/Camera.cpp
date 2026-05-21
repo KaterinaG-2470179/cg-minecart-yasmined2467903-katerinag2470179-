@@ -19,9 +19,6 @@ Camera::Camera(float screenWidth, float screenHeight,
 
 void Camera::ProcessKeyboard(GLFWwindow* window, float deltaTime)
 {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-
     float velocity = SPEED * deltaTime;
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)

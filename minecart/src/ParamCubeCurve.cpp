@@ -24,6 +24,6 @@ glm::vec3 ParamCubeCurve::GetPoint(int index) const {
     return m_points[index];
 }
 
-const glm::vec3* ParamCubeCurve::GetPoints() const { 
-    return m_points.data(); 
+const std::vector<glm::vec3>& ParamCubeCurve::GetPoints() const {
+    return m_points;
 }

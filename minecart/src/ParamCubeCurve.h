@@ -17,7 +17,7 @@ public:
     void ClearPoints();
     int PointCount() const;
     glm::vec3 GetPoint(int index) const;
-    const glm::vec3* GetPoints() const;
+    const std::vector<glm::vec3>& GetPoints() const;
 
 protected:
     glm::mat4 m_base;

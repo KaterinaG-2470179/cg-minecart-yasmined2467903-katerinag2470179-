@@ -13,11 +13,34 @@ add_executable(minecart
     src/Bezier.h
     src/Bezier.cpp
 
+    src/BezierMesh.h
+    src/BezierMesh.cpp
+
     src/ParamCubeCurve.h
     src/ParamCubeCurve.cpp
 
     src/Camera.h
     src/Camera.cpp
+
+    src/Mesh.h
+    src/Mesh.cpp
+
+    src/Cube.h
+    src/Cube.cpp
+
+    src/Plane.h
+    src/Plane.cpp
+
+    src/FBO.h
+    src/FBO.cpp
+
+    src/PostProcessor.h
+    src/PostProcessor.cpp
+
+    src/ShaderProgram.h
+    src/ShaderProgram.cpp
+
+    external/glad/src/glad.c
 )
 
 target_link_libraries(minecart PRIVATE
@@ -26,7 +49,8 @@ target_link_libraries(minecart PRIVATE
 )
 
 target_include_directories(minecart PRIVATE
-    external/glad/include
+    external/glad/include/
+    external/glad/src/
     external/stb_image
     shaders/
 )
