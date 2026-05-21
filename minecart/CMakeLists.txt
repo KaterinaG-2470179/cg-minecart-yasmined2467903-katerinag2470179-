@@ -15,6 +15,12 @@ add_executable(minecart
 
     src/ParamCubeCurve.h
     src/ParamCubeCurve.cpp
+
+    src/Camera.h
+    src/Camera.cpp
+
+    shaders/fragment.glsl
+    shaders/vertex.glsl
 )
 
 target_link_libraries(minecart PRIVATE
