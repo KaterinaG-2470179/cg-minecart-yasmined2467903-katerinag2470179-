@@ -52,6 +52,8 @@ void processPostProcessInput(GLFWwindow* window, PostProcessMode& mode)
             mode = PostProcessMode::Blur;
         else if (mode == PostProcessMode::Blur)
             mode = PostProcessMode::Sobel;
+        else if (mode == PostProcessMode::Sobel)
+            mode = PostProcessMode::ChromaKey;
         else
             mode = PostProcessMode::None;
 

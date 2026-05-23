@@ -7,7 +7,8 @@ enum class PostProcessMode
 {
     None,
     Blur,
-    Sobel
+    Sobel,
+    ChromaKey,
 };
 
 class PostProcessor
@@ -26,11 +27,12 @@ private:
     PostProcessMode mode = PostProcessMode::None;
 
     FBO sceneFbo;   // pass 1: scene renders
-    FBO blurFbo;    // pass 2: blurred
 
     ShaderProgram blurShader;
     ShaderProgram sobelShader;
     ShaderProgram passShader;
+    ShaderProgram chromaKeyShader;
 
     unsigned int quadVAO, quadVBO;
+    unsigned int frameTexture;
 };

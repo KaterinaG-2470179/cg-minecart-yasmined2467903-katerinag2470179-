@@ -1,6 +1,8 @@
 #version 330 core
+
 out vec4 FragColor;
 in vec2 TexCoords;
+
 uniform sampler2D screenTexture;
 
 const float offset = 1.0 / 300.0;
@@ -8,8 +10,8 @@ const float offset = 1.0 / 300.0;
 void main()
 {
     vec2 offsets[9] = vec2[](
-        vec2(-offset,  offset), vec2(0.0, offset),  vec2(offset,  offset),
-        vec2(-offset,  0.0),    vec2(0.0, 0.0),     vec2(offset,  0.0),
+        vec2(-offset, offset), vec2(0.0, offset), vec2(offset, offset),
+        vec2(-offset, 0.0), vec2(0.0, 0.0), vec2(offset, 0.0),
         vec2(-offset, -offset), vec2(0.0, -offset), vec2(offset, -offset)
     );
 

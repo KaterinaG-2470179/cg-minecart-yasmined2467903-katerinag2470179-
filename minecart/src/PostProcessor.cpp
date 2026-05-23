@@ -1,4 +1,5 @@
 #include "PostProcessor.h"
+#include "Cube.h"  // load texture
 
 #include <glad/glad.h>
 
@@ -14,16 +15,36 @@ static const float s_quadVertices[] = {
 
 PostProcessor::PostProcessor(unsigned int width, unsigned int height)
     : sceneFbo(width, height, true), // true: needs depth
-      blurFbo (width, height, false),
       blurShader ("shaders/screen.vs", "shaders/blur.fs"),
       sobelShader("shaders/screen.vs", "shaders/sobel.fs"),
-      passShader("shaders/screen.vs", "shaders/passthrough.fs")
+      passShader("shaders/screen.vs", "shaders/passthrough.fs"),
+      chromaKeyShader("shaders/screen.vs", "shaders/chroma_key.fs")
 {
     blurShader.use();
     blurShader.setInt("screenTexture", 0);
 
     sobelShader.use();
     sobelShader.setInt("screenTexture", 0);
+
+    //frameTexture = loadTexture("resources/pumpkin.png");
+    frameTexture = loadTexture("resources/frame.jpg");
+
+    glBindTexture(GL_TEXTURE_2D, frameTexture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    int texW, texH;
+    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH,  &texW);
+    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &texH);
+    float imageAspect = (float)texW / (float)texH;
+
+    chromaKeyShader.use();
+    chromaKeyShader.setInt("screenTexture", 0);
+    chromaKeyShader.setInt("sceneTexture", 1);
+    chromaKeyShader.setFloat("threshold", 0.3f);
+    chromaKeyShader.setFloat("softness",  0.1f);
+    chromaKeyShader.setFloat("aspectRatio", (float)width / (float)height);
+    chromaKeyShader.setFloat("imageAspect", imageAspect);
 
     glGenVertexArrays(1, &quadVAO);
     glGenBuffers(1, &quadVBO);
@@ -45,7 +66,6 @@ void PostProcessor::setMode(PostProcessMode newMode)
 void PostProcessor::resize(unsigned int width, unsigned int height)
 {
     sceneFbo = FBO(width, height, true);
-    blurFbo  = FBO(width, height, false);
 }
 
 void PostProcessor::beginScene()
@@ -59,43 +79,33 @@ void PostProcessor::beginScene()
 void PostProcessor::render()
 {
     glDisable(GL_DEPTH_TEST);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glClear(GL_COLOR_BUFFER_BIT);
 
-    if (mode == PostProcessMode::None)
-    {
+    if (mode == PostProcessMode::ChromaKey) {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClear(GL_COLOR_BUFFER_BIT);
+        glDisable(GL_DEPTH_TEST);
 
-        passShader.use();
-
+        chromaKeyShader.use();
         glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, frameTexture);
+        glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, sceneFbo.getTexture());
+        chromaKeyShader.setInt("screenTexture", 0);
+        chromaKeyShader.setInt("sceneTexture", 1);
 
         glBindVertexArray(quadVAO);
         glDrawArrays(GL_TRIANGLES, 0, 6);
-    }
-    else if (mode == PostProcessMode::Blur)
-    {
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        blurShader.use();
-
+        glBindVertexArray(0);
+    } else {
+        switch(mode) {
+            case PostProcessMode::Blur:   blurShader.use();  break;
+            case PostProcessMode::Sobel:  sobelShader.use(); break;
+            default:                      passShader.use();  break;
+        }
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, sceneFbo.getTexture());
-
-        glBindVertexArray(quadVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-    }
-    else if (mode == PostProcessMode::Sobel)
-    {
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        sobelShader.use();
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, sceneFbo.getTexture());
-
         glBindVertexArray(quadVAO);
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }
