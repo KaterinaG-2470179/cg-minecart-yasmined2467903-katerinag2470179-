@@ -6,23 +6,26 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
+find_package(assimp REQUIRED)
 
 add_executable(minecart
     src/main.cpp
 
-    src/Bezier.h
     src/Bezier.cpp
-
-    src/ParamCubeCurve.h
     src/ParamCubeCurve.cpp
 
-    src/Camera.h
     src/Camera.cpp
- "src/Room.h" "src/Room.cpp")
+    src/Room.cpp
+    
+    src/Mesh.cpp
+    src/Model.cpp
+    src/Shader.cpp
+)
 
 target_link_libraries(minecart PRIVATE
     glfw
     OpenGL::GL
+    assimp::assimp
 )
 
 target_include_directories(minecart PRIVATE
