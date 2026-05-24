@@ -1,4 +1,3 @@
-#define GLAD_GL_IMPLEMENTATION
 #define GLFW_INCLUDE_NONE
 #define STB_IMAGE_IMPLEMENTATION
 
@@ -18,6 +17,8 @@
 #include "Camera.h"
 #include "Room.h"
 #include "Model.h"
+#include "RailPlacer.h"
+#include "Animating.h"
 
 Camera* g_camera = nullptr;
 
@@ -58,9 +59,8 @@ int main()
     glEnable(GL_DEPTH_TEST);
 
     Room room;
-    Model minecart("resources/models/minecart/minecart.obj");
-    Shader debugShader("shaders/debug.vert", "shaders/debug.frag");
 
+    Shader debugShader("shaders/debug.vert", "shaders/debug.frag");
     Camera camera(SCR_WIDTH, SCR_HEIGHT);
     g_camera = &camera;
 
@@ -69,6 +69,11 @@ int main()
         glm::vec3(1, -3, 0), glm::vec3(3, 0, 0), 100
     );
     bezier.iterate();
+    bezier.buildArcLenTable();
+
+    Model minecart("resources/models/minecart/minecart.obj");
+    RailPlacer railPlacer(bezier, "resources/models/rail/rail.obj", 25);
+    Animating animater(bezier, minecart, 1.0f);
 
     float cubeVertices[] = {
         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
@@ -267,10 +272,17 @@ int main()
         //model
         minecart.Draw(debugShader);
 
+        //rails
+        //railPlacer.draw(debugShader);
+
         // bezier
         glBindVertexArray(bezierVAO);
         glDrawArrays(GL_LINE_STRIP, 0, bezier.PointCount());
         glBindVertexArray(0);
+
+        //animating cart over curve
+        animater.update(deltaTime);
+        animater.draw(debugShader, view, projection);
 
         glBindFramebuffer(GL_FRAMEBUFFER, blurFbo);
         glDisable(GL_DEPTH_TEST);

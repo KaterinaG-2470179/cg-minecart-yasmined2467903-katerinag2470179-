@@ -43,10 +43,6 @@ void Mesh::setupMesh()
 
 void Mesh::Draw(Shader& shader)
 {
-	std::cout << "Mesh textures: " << m_textures.size() << std::endl;
-	for (auto& t : m_textures)
-		std::cout << "  type: " << t.type << " path: " << t.path << std::endl;
-
 	unsigned int diffuseNr = 1;
 	unsigned int specularNr = 1;
 	for (unsigned int i = 0; i < m_textures.size(); i++)

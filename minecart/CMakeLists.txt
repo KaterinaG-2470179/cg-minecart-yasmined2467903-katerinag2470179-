@@ -20,7 +20,12 @@ add_executable(minecart
     src/Mesh.cpp
     src/Model.cpp
     src/Shader.cpp
-)
+
+    src/RailPlacer.cpp
+    src/Animating.cpp
+
+    external/glad/src/glad.c
+ )
 
 target_link_libraries(minecart PRIVATE
     glfw
