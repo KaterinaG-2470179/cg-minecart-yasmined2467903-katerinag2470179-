@@ -1,6 +1,7 @@
 #include "ParamCubeCurve.h"
 
-ParamCubeCurve::ParamCubeCurve(glm::vec3 p0, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, int steps) : m_geometric(p0, p1, p2, p3), m_base(1.0f), m_steps(steps) {}
+ParamCubeCurve::ParamCubeCurve(glm::vec3 p0, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, int steps) 
+    : m_geometric(p0, p1, p2, p3), m_base(1.0f), m_steps(steps) {}
 
 glm::vec3 ParamCubeCurve::Evaluate(double t) {
     glm::vec4 T(t*t*t, t*t, t, 1.0);

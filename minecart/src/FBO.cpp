@@ -1,6 +1,6 @@
 #include "FBO.h"
 
-FBO::FBO(unsigned int width, unsigned int height, bool withDepth)
+FBO::FBO(unsigned int width, unsigned int height, bool withDepth, bool hdr)
     : fbo(0), texture(0), rbo(0)
 {
     glGenFramebuffers(1, &fbo);
@@ -8,7 +8,12 @@ FBO::FBO(unsigned int width, unsigned int height, bool withDepth)
 
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+
+    if (hdr)
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
+    else
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -23,13 +28,12 @@ FBO::FBO(unsigned int width, unsigned int height, bool withDepth)
     }
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+        std::cout << "error: Framebuffer is not complete!" << std::endl;
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-FBO::~FBO()
-{
+FBO::~FBO() {
     if (rbo) glDeleteRenderbuffers(1, &rbo);
     glDeleteTextures(1, &texture);
     glDeleteFramebuffers(1, &fbo);
@@ -38,35 +42,32 @@ FBO::~FBO()
 FBO::FBO(FBO&& other) noexcept
     : fbo(other.fbo), texture(other.texture), rbo(other.rbo)
 {
-    other.fbo     = 0;
+    other.fbo = 0;
     other.texture = 0;
-    other.rbo     = 0;
+    other.rbo = 0;
 }
 
-FBO& FBO::operator=(FBO&& other) noexcept
-{
+FBO& FBO::operator=(FBO&& other) noexcept {
     if (this != &other) {
-        if (rbo)     glDeleteRenderbuffers(1, &rbo);
+        if (rbo) glDeleteRenderbuffers(1, &rbo);
         if (texture) glDeleteTextures(1, &texture);
-        if (fbo)     glDeleteFramebuffers(1, &fbo);
+        if (fbo) glDeleteFramebuffers(1, &fbo);
 
-        fbo     = other.fbo;
+        fbo = other.fbo;
         texture = other.texture;
-        rbo     = other.rbo;
+        rbo = other.rbo;
 
-        other.fbo     = 0;
+        other.fbo = 0;
         other.texture = 0;
-        other.rbo     = 0;
+        other.rbo = 0;
     }
     return *this;
 }
 
-void FBO::bind() const
-{
+void FBO::bind() const {
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 }
 
-void FBO::unbind() const
-{
+void FBO::unbind() const {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

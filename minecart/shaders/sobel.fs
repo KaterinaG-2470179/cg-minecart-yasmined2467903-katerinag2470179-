@@ -5,10 +5,9 @@ in vec2 TexCoords;
 
 uniform sampler2D screenTexture;
 
-const float offset = 1.0 / 300.0;
+const float offset = 1.0 / 700.0;
 
-void main()
-{
+void main() {
     vec2 offsets[9] = vec2[](
         vec2(-offset, offset), vec2(0.0, offset), vec2(offset, offset),
         vec2(-offset, 0.0), vec2(0.0, 0.0), vec2(offset, 0.0),
@@ -16,8 +15,11 @@ void main()
     );
 
     vec3 sampleTex[9];
-    for (int i = 0; i < 9; i++)
-        sampleTex[i] = vec3(texture(screenTexture, TexCoords + offsets[i]));
+    for (int i = 0; i < 9; i++) {
+        vec3 col = vec3(texture(screenTexture, TexCoords + offsets[i]));
+        float grey = dot(col, vec3(0.3, 0.6, 0.1));
+        sampleTex[i] = vec3(grey);
+    }
 
     // horizontal and vertical sobel kernels
     float Kx[9] = float[](-1, 0, 1,
@@ -39,3 +41,4 @@ void main()
 
     FragColor = vec4(edges, 1.0);
 }
+

@@ -17,8 +17,7 @@ Camera::Camera(float screenWidth, float screenHeight,
     updateCameraVectors();
 }
 
-void Camera::ProcessKeyboard(GLFWwindow* window, float deltaTime)
-{
+void Camera::ProcessKeyboard(GLFWwindow* window, float deltaTime) {
     float velocity = SPEED * deltaTime;
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
@@ -35,10 +34,8 @@ void Camera::ProcessKeyboard(GLFWwindow* window, float deltaTime)
         m_position -= velocity * m_up;
 }
 
-void Camera::ProcessMouseMovement(GLFWwindow* window, double xpos, double ypos)
-{
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) != GLFW_PRESS)
-    {
+void Camera::ProcessMouseMovement(GLFWwindow* window, double xpos, double ypos) {
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) != GLFW_PRESS) {
         m_firstMouse = true;
         return;
     }
@@ -46,8 +43,7 @@ void Camera::ProcessMouseMovement(GLFWwindow* window, double xpos, double ypos)
     float x = static_cast<float>(xpos);
     float y = static_cast<float>(ypos);
 
-    if (m_firstMouse)
-    {
+    if (m_firstMouse) {
         m_lastX      = x;
         m_lastY      = y;
         m_firstMouse = false;
@@ -58,25 +54,23 @@ void Camera::ProcessMouseMovement(GLFWwindow* window, double xpos, double ypos)
     m_lastX = x;
     m_lastY = y;
 
-    m_yaw   += xoffset;
-    m_pitch  = std::clamp(m_pitch + yoffset, -89.0f, 89.0f);
+    m_yaw += xoffset;
+    m_pitch = std::clamp(m_pitch + yoffset, -89.0f, 89.0f);
 
     updateCameraVectors();
 }
 
-glm::mat4 Camera::GetViewMatrix() const
-{
+glm::mat4 Camera::GetViewMatrix() const {
     return glm::lookAt(m_position, m_position + m_front, m_up);
 }
 
-void Camera::updateCameraVectors()
-{
+void Camera::updateCameraVectors() {
     glm::vec3 front;
-    front.x = cos(glm::radians(m_yaw))   * cos(glm::radians(m_pitch));
+    front.x = cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
     front.y = sin(glm::radians(m_pitch));
-    front.z = sin(glm::radians(m_yaw))   * cos(glm::radians(m_pitch));
+    front.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
 
     m_front = glm::normalize(front);
     m_right = glm::normalize(glm::cross(m_front, m_worldUp));
-    m_up    = glm::normalize(glm::cross(m_right, m_front));
+    m_up = glm::normalize(glm::cross(m_right, m_front));
 }

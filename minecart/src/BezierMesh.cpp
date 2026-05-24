@@ -10,8 +10,7 @@ BezierMesh::BezierMesh(Bezier& bezier)
     update();
 }
 
-void BezierMesh::update()
-{
+void BezierMesh::update() {
     const auto& pts = m_bezier.GetPoints();
     m_count = pts.size();
 
@@ -31,8 +30,7 @@ void BezierMesh::update()
     glBindVertexArray(0);
 }
 
-void BezierMesh::draw(const ShaderProgram& shader)
-{
+void BezierMesh::draw(const ShaderProgram& shader) {
     shader.setMat4("model", glm::mat4(1.0f));
 
     glBindVertexArray(VAO);

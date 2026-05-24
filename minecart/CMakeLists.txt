@@ -25,8 +25,8 @@ add_executable(minecart
     src/Mesh.h
     src/Mesh.cpp
 
-    src/Cube.h
-    src/Cube.cpp
+    src/Torch.h
+    src/Torch.cpp
 
     src/Plane.h
     src/Plane.cpp
@@ -39,6 +39,12 @@ add_executable(minecart
 
     src/ShaderProgram.h
     src/ShaderProgram.cpp
+
+    src/TextureUtil.h
+    src/TextureUtil.cpp
+
+    src/PointLight.h
+    src/PointLight.cpp
 
     external/glad/src/glad.c
 )

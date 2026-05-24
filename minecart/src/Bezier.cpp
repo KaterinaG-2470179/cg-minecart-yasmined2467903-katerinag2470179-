@@ -1,8 +1,8 @@
 #include <iostream>
 #include "Bezier.h"
 
-Bezier::Bezier(glm::vec3 p0, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, int steps, Bezier::IterationMethod method) : ParamCubeCurve(p0, p1, p2, p3, steps), m_method(method) {
-}
+Bezier::Bezier(glm::vec3 p0, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, int steps, Bezier::IterationMethod method) 
+    : ParamCubeCurve(p0, p1, p2, p3, steps), m_method(method) {}
 
 void Bezier::iterate() {
     ClearPoints();
@@ -42,20 +42,20 @@ void Bezier::ForwardDifference(int steps) {
 
     glm::mat4x3 GM = m_geometric * m_base;
 
-    glm::vec3 a =  GM[3];
+    glm::vec3 a = GM[3];
     glm::vec3 b = GM[2];
     glm::vec3 c = GM[1];
     glm::vec3 dd = GM[0];
 
-    glm::vec3 f   = a;
-    glm::vec3 df  = b*h + c*h2 + dd*h3;
+    glm::vec3 f = a;
+    glm::vec3 df = b*h + c*h2 + dd*h3;
     glm::vec3 d2f = 2.0f*c*h2 + 6.0f*dd*h3;
     glm::vec3 d3f = 6.0f*dd*h3;
 
     for (int i = 0; i <= steps; i++) {
         AddPoint(f);
-        f   += df;
-        df  += d2f;
+        f += df;
+        df += d2f;
         d2f += d3f;
     }
 }
