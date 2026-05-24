@@ -8,11 +8,10 @@ Bezier::Bezier(glm::vec3 p0, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, int steps
 
 void Bezier::iterate() {
     ClearPoints();
-    int totalSteps = m_steps * m_segments.size();
-    for (int i = 0; i <= totalSteps; i++) {
-        float t = (float)i / totalSteps;
-        AddPoint(GetPointAt(t));
-    }
+    if (m_method == IterationMethod::BRUTEFORCE)
+        Bruteforce(m_steps * m_segments.size());
+    else
+        ForwardDifference(m_steps * m_segments.size());
 }
 
 Bezier::Bezier() : ParamCubeCurve(glm::vec3(), glm::vec3(), glm::vec3(), glm::vec3(), 0), m_method(IterationMethod::BRUTEFORCE) {

@@ -104,7 +104,7 @@ void PostProcessor::setMode(PostProcessMode newMode) { mode = newMode; }
 void PostProcessor::resize(unsigned int w, unsigned int h) {
     width = w; height = h;
     setupSceneFBO(w, h);
-    blurFbo = FBO(w, h, false);
+    blurFbo = FBO(w, h, false, true);
 }
 
 void PostProcessor::beginScene() {
