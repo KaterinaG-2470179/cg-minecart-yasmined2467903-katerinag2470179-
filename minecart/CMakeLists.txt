@@ -13,21 +13,60 @@ add_executable(minecart
     src/Bezier.h
     src/Bezier.cpp
 
+    src/BezierMesh.h
+    src/BezierMesh.cpp
+
     src/ParamCubeCurve.h
     src/ParamCubeCurve.cpp
 
     src/Camera.h
     src/Camera.cpp
 
-    shaders/fragment.glsl
-    shaders/vertex.glsl
+    src/Mesh.h
+    src/Mesh.cpp
+
+    src/ModelMesh.h
+    src/ModelMesh.cpp
+
+    src/Model.h
+    src/Model.cpp
+
+    src/Torch.h
+    src/Torch.cpp
+
+    src/Plane.h
+    src/Plane.cpp
+
+    src/FBO.h
+    src/FBO.cpp
+
+    src/PostProcessor.h
+    src/PostProcessor.cpp
+
+    src/ShaderProgram.h
+    src/ShaderProgram.cpp
+
+    src/TextureUtil.h
+    src/TextureUtil.cpp
+
+    src/PointLight.h
+    src/PointLight.cpp
+
+    src/Animating.h
+    src/Animating.cpp
+
+    external/glad/src/glad.c
 )
 
 target_link_libraries(minecart PRIVATE
     glfw
     OpenGL::GL
+    assimp
 )
 
 target_include_directories(minecart PRIVATE
-    external/glad/include
+    external/glad/include/
+    external/glad/src/
+    external/stb_image
+    shaders/
 )
