@@ -22,3 +22,7 @@ From inside the `minecart` folder, do
 2. `cmake -S . -B build`
 3. `cmake --build build -j$(nproc)`
 4. `./build/minecart`
+
+## Vcpkg install
+We installed assimp through vcpkg, make sure to do so before running the program else it will not run
+when assimp is installed, run `integrate install` to make sure that it will be used in the project as well
