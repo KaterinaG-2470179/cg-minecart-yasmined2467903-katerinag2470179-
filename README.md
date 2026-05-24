@@ -15,3 +15,10 @@ A Minecraft inspired university project.
 - `F` : Toggle first-person view
 - `ESC` : Exit window
 - `Left Mouse Click` : Toggle torches on and off (have to click on tip of torch)
+
+## Compile and run the project on Linux
+From inside the `minecart` folder, do
+1. (If there is a pre-existing `build` folder) `rm -rf folder`
+2. `cmake -S . -B build`
+3. `cmake --build build -j$(nproc)`
+4. `./build/minecart`
