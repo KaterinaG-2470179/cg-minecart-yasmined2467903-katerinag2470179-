@@ -26,9 +26,22 @@ Bezier::Bezier() : ParamCubeCurve(glm::vec3(), glm::vec3(), glm::vec3(), glm::ve
 }
 
 void Bezier::Bruteforce(int steps) {
-    for (int i = 0; i <= steps; i++) {
-        double t = (double)i / steps;
-        AddPoint(Evaluate(t));
+    for (int x = 0; x < m_segments.size(); x++) {
+        Segment& seg = m_segments[x];
+
+        //do this check for safety to check if we are at our endpoint/beginpoint, because we dont want to put out point to be duped in our point list
+        int end = steps - 1;
+        if (x == m_segments.size() - 1) { end = steps; }
+
+        for (int i = 0; i <= end; i++) {
+            float t = (float)i / steps;
+            float x = 1.0f - t;
+            glm::vec3 point = x * x * x * seg.p0 +
+                3 * x * x * t * seg.p1 +
+                3 * x * t * t * seg.p2 +
+                t * t * t * seg.p3;
+            AddPoint(point);
+        }
     }
 }
 
@@ -37,23 +50,40 @@ void Bezier::ForwardDifference(int steps) {
     float h2 = h * h;
     float h3 = h2 * h;
 
-    glm::mat4x3 GM = m_geometric * m_base;
+    //need to constantly build it for each segment that we have
+    for (int i = 0; i < m_segments.size(); i++) {
+        Segment& seg = m_segments[i];
 
-    glm::vec3 a =  GM[3];
-    glm::vec3 b = GM[2];
-    glm::vec3 c = GM[1];
-    glm::vec3 dd = GM[0];
+        //build geometric matrix for curr segment
+        glm::mat4x3 geo = glm::mat4x3(
+            seg.p0.x, seg.p0.y, seg.p0.z,
+            seg.p1.x, seg.p1.y, seg.p1.z,
+            seg.p2.x, seg.p2.y, seg.p2.z,
+            seg.p3.x, seg.p3.y, seg.p3.z
+        );
 
-    glm::vec3 f   = a;
-    glm::vec3 df  = b*h + c*h2 + dd*h3;
-    glm::vec3 d2f = 2.0f*c*h2 + 6.0f*dd*h3;
-    glm::vec3 d3f = 6.0f*dd*h3;
+        glm::mat4x3 GM = geo * m_base;
 
-    for (int i = 0; i <= steps; i++) {
-        AddPoint(f);
-        f   += df;
-        df  += d2f;
-        d2f += d3f;
+        glm::vec3 a = GM[3];
+        glm::vec3 b = GM[2];
+        glm::vec3 c = GM[1];
+        glm::vec3 dd = GM[0];
+
+        glm::vec3 f = a;
+        glm::vec3 df = b * h + c * h2 + dd * h3;
+        glm::vec3 d2f = 2.0f * c * h2 + 6.0f * dd * h3;
+        glm::vec3 d3f = 6.0f * dd * h3;
+
+        //do this check for safety to check if we are at our endpoint/beginpoint, because we dont want to put out point to be duped in our point list
+        int end = steps - 1;
+        if (i == m_segments.size() - 1) { end = steps; }
+
+        for (int x = 0; x <= end; x++) {
+            AddPoint(f);
+            f += df;
+            df += d2f;
+            d2f += d3f;
+        }
     }
 }
 
