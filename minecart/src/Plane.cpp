@@ -9,10 +9,9 @@
 #include <cmath>
 
 static const float RADIUS = 20.0f;
-static const float TILE = 8.0f;
 static const int   SEGMENTS = 64;
 
-Plane::Plane() : texture(loadTexture("resources/grass.png")) {
+Plane::Plane() : texture(loadTexture("resources/textures/minefloor.png")) {
     std::vector<float> verts;
 
     float angleStep = 2.0f * 3.14159265f / SEGMENTS;
@@ -28,8 +27,8 @@ Plane::Plane() : texture(loadTexture("resources/grass.png")) {
             verts.insert(verts.end(), {
                 x, 0.0f, z,
                 0.0f, 1.0f, 0.0f,
-                (x / TILE + 0.5f),
-                (z / TILE + 0.5f)
+                (x / RADIUS * 0.5f + 0.5f),
+                (z / RADIUS * 0.5f + 0.5f)
             });
         };
 
@@ -60,8 +59,8 @@ void Plane::draw(const ShaderProgram& shader) {
     glBindVertexArray(VAO);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glDrawArrays(GL_TRIANGLES, 0, vertCount);
     glBindVertexArray(0);
 }

@@ -7,9 +7,9 @@
 #include <iostream>
 
 static const char* s_facePaths[3] = {
-    "resources/torch_side.png",
-    "resources/torch_bottom.png",
-    "resources/torch_top.png",
+    "resources/textures/torch_side.png",
+    "resources/textures/torch_bottom.png",
+    "resources/textures/torch_top.png",
 };
 
 static const float s_vertices[] = {
@@ -62,7 +62,7 @@ static const float s_vertices[] = {
     -0.25f, 3.0f, -0.25f,  0,1,0,  0,1,
 };
 
-Torch::Torch(glm::vec3 pos) : position(pos) {
+Torch::Torch(glm::vec3 pos, float scale) : position(pos), scale(scale) {
     for (int i = 0; i < 3; i++)
         textures[i] = loadTexture(s_facePaths[i]);
 
@@ -89,6 +89,7 @@ Torch::~Torch() {
 
 void Torch::draw(const ShaderProgram& shader) {
     glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
+    model = glm::scale(model, glm::vec3(scale));
     shader.setMat4("model", model);
 
     glBindVertexArray(VAO);

@@ -33,7 +33,9 @@ void BezierMesh::update() {
 void BezierMesh::draw(const ShaderProgram& shader) {
     shader.setMat4("model", glm::mat4(1.0f));
 
+    glLineWidth(3.0f);
     glBindVertexArray(VAO);
     glDrawArrays(GL_LINE_STRIP, 0, (GLsizei)m_count);
     glBindVertexArray(0);
+    glLineWidth(1.0f);
 }

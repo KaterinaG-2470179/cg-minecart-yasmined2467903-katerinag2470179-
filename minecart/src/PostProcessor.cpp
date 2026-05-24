@@ -68,9 +68,9 @@ PostProcessor::PostProcessor(unsigned int width, unsigned int height)
     bloomShader.use();
     bloomShader.setInt("screenTexture", 0);
     bloomShader.setInt("bloomBlur", 1);
-    bloomShader.setFloat("bloomStrength", 0.5f);
+    bloomShader.setFloat("bloomStrength", 0.9f);
 
-    frameTexture = loadTexture("resources/pumpkin.png");
+    frameTexture = loadTexture("resources/textures/pumpkin.png");
     glBindTexture(GL_TEXTURE_2D, frameTexture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);

@@ -25,6 +25,12 @@ add_executable(minecart
     src/Mesh.h
     src/Mesh.cpp
 
+    src/ModelMesh.h
+    src/ModelMesh.cpp
+
+    src/Model.h
+    src/Model.cpp
+
     src/Torch.h
     src/Torch.cpp
 
@@ -46,12 +52,16 @@ add_executable(minecart
     src/PointLight.h
     src/PointLight.cpp
 
+    src/Animating.h
+    src/Animating.cpp
+
     external/glad/src/glad.c
 )
 
 target_link_libraries(minecart PRIVATE
     glfw
     OpenGL::GL
+    assimp
 )
 
 target_include_directories(minecart PRIVATE

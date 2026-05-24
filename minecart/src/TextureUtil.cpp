@@ -27,5 +27,6 @@ unsigned int loadTexture(const char* path)
         std::cerr << "Failed to load texture: " << path << std::endl;
     }
     stbi_image_free(data);
+    stbi_set_flip_vertically_on_load(false);
     return id;
 }

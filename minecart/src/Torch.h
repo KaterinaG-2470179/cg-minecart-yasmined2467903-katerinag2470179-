@@ -8,12 +8,13 @@
 
 class Torch : public Mesh {
     public:
-        explicit Torch(glm::vec3 position = glm::vec3(0.0f));
+        explicit Torch(glm::vec3 position = glm::vec3(0.0f), float scale = 0.5f);
         ~Torch() override;
 
         void draw(const ShaderProgram& shader) override;
 
         glm::vec3 position;
+        float scale;
 
     private:
         unsigned int textures[3] = {};

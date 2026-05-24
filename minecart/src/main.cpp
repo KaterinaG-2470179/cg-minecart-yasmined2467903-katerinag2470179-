@@ -18,6 +18,8 @@
 #include "Bezier.h"
 #include "BezierMesh.h"
 #include "PointLight.h"
+#include "Model.h"
+#include "Animating.h"
 
 PostProcessMode mode = PostProcessMode::None;
 
@@ -31,6 +33,7 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 bool nightMode = false;
+bool firstPerson = false;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
@@ -39,13 +42,15 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 }
 
 static const glm::vec3 s_torchPositions[] = {
-    glm::vec3(-4.0f, 0.0f, -2.0f),
-    glm::vec3( 3.0f, 0.0f,  0.0f),
-    glm::vec3( 1.0f, 0.0f,  4.0f),
-    glm::vec3(-2.0f, 0.0f,  1.0f),
+    glm::vec3( 5.0f, 0.0f,  0.0f),
+    glm::vec3( 2.5f, 0.0f,  4.3f),
+    glm::vec3(-2.5f, 0.0f,  4.3f),
+    glm::vec3(-5.0f, 0.0f,  0.0f),
+    glm::vec3(-2.5f, 0.0f, -4.3f),
+    glm::vec3( 2.5f, 0.0f, -4.3f),
 };
-static const int NUM_TORCHES = sizeof(s_torchPositions) / sizeof(s_torchPositions[0]);
-bool torchActive[NUM_TORCHES] = { true, true, true, true };
+static const int NUM_TORCHES = 6;
+bool torchActive[NUM_TORCHES] = { true, true, true, true, true, true };
 
 bool rayHitsSphere(glm::vec3 rayOrigin, glm::vec3 rayDir, glm::vec3 center, float radius) {
     glm::vec3 oc = rayOrigin - center;
@@ -85,7 +90,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
     glm::vec3 rayOrigin = g_camera->GetPosition();
 
     for (int i = 0; i < NUM_TORCHES; i++) {
-        glm::vec3 torchCenter = s_torchPositions[i] + glm::vec3(0.0f, 3.0f, 0.0f);
+        glm::vec3 torchCenter = s_torchPositions[i] + glm::vec3(0.0f, 1.5f, 0.0f);
         float dist = glm::length(rayOrigin - torchCenter);
         if (rayHitsSphere(rayOrigin, worldRay, torchCenter, 0.6f)) {
             torchActive[i] = !torchActive[i];
@@ -95,6 +100,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 }
 
 void processPostProcessInput(GLFWwindow* window, PostProcessMode& mode) {
+    static bool fPressed = false;
     static bool pPressed = false;
     static bool bPressed = false;
     static bool nPressed = false;
@@ -131,6 +137,12 @@ void processPostProcessInput(GLFWwindow* window, PostProcessMode& mode) {
         nPressed = true;
     }
 
+    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS && !fPressed) {
+        firstPerson = !firstPerson;
+        fPressed = true;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_RELEASE) fPressed = false;
     if (glfwGetKey(window, GLFW_KEY_P) == GLFW_RELEASE) pPressed = false;
     if (glfwGetKey(window, GLFW_KEY_B) == GLFW_RELEASE) bPressed = false;
     if (glfwGetKey(window, GLFW_KEY_N) == GLFW_RELEASE) nPressed = false;
@@ -158,9 +170,6 @@ int main() {
 
     glEnable(GL_DEPTH_TEST);
 
-    Camera camera(SCR_WIDTH, SCR_HEIGHT);
-    g_camera = &camera;
-
     ShaderProgram sceneShader("shaders/vertex.vs", "shaders/fragment.fs");
 
     // Floor
@@ -172,18 +181,23 @@ int main() {
 
     for (int i = 0; i < NUM_TORCHES; i++) {
         torches[i] = std::make_unique<Torch>(s_torchPositions[i]);
-        lights.emplace_back(s_torchPositions[i] + glm::vec3(0.0f, 2.85f, 0.0f));
+        lights.emplace_back(s_torchPositions[i] + glm::vec3(0.0f, 1.425f, 0.0f));
     }
 
-    // bezier
-    Bezier bezier(
-        glm::vec3(-3, 0, 0),
-        glm::vec3(-1, 0, 3),
-        glm::vec3( 1, 0,-3),
-        glm::vec3( 3, 0, 0),
-        100
-    );
+    Camera camera(SCR_WIDTH, SCR_HEIGHT);
+    g_camera = &camera;
+
+    Bezier bezier(glm::vec3(0, 0, 3), glm::vec3(2, 0, 3), glm::vec3(3, 0, 2), glm::vec3(3, 0, 0), 100);
+
+    bezier.addSegment(glm::vec3(3, 0, -2), glm::vec3(2, 2, -3), glm::vec3(0, 3, -3));
+    bezier.addSegment(glm::vec3(-2, 4, -3), glm::vec3(-3, 3, -2), glm::vec3(-3, 2, 0));
+    bezier.addSegment(glm::vec3(-3, 1, 2), glm::vec3(-2, 0, 3), glm::vec3(0, 0, 3));
+
     bezier.iterate();
+    bezier.buildArcLenTable();
+
+    Model minecart("resources/models/minecart/minecart.obj");
+    Animating animater(bezier, minecart, 1.6f);
 
     BezierMesh bezierMesh(bezier);
 
@@ -245,11 +259,29 @@ int main() {
 
         sceneShader.setInt("numPointLights", activeLights);
 
+        animater.update(deltaTime);
+
+        if (firstPerson) {
+            glm::vec3 cartPos = glm::vec3(animater.getModelMatrix()[3]);
+            glm::vec3 cartForward = glm::vec3(animater.getModelMatrix()[2]);
+            glm::vec3 cartUp = glm::vec3(animater.getModelMatrix()[1]);
+
+            glm::vec3 eyePos = cartPos + cartUp * 0.8f;
+            glm::vec3 lookAt = eyePos + cartForward;
+
+            view = glm::lookAt(eyePos, lookAt, cartUp);
+        }
+
+        sceneShader.setMat4("view", view);
+
         for (int i = 0; i < NUM_TORCHES; i++)
             torches[i]->draw(sceneShader);
             
         plane.draw(sceneShader);
         bezierMesh.draw(sceneShader);
+
+        if (!firstPerson)
+            animater.draw(sceneShader, view, projection);
 
         post.render();
 
