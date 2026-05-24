@@ -17,7 +17,6 @@
 #include "Camera.h"
 #include "Room.h"
 #include "Model.h"
-#include "RailPlacer.h"
 #include "Animating.h"
 
 Camera* g_camera = nullptr;
@@ -64,15 +63,16 @@ int main()
     Camera camera(SCR_WIDTH, SCR_HEIGHT);
     g_camera = &camera;
 
-    Bezier bezier(
-        glm::vec3(-3, 0, 0), glm::vec3(-1, 3, 0),
-        glm::vec3(1, -3, 0), glm::vec3(3, 0, 0), 100
-    );
+    Bezier bezier(glm::vec3(0, 0, 3), glm::vec3(2, 0, 3), glm::vec3(3, 0, 2), glm::vec3(3, 0, 0), 100);
+
+    bezier.addSegment(glm::vec3(3, 0, -2), glm::vec3(2, 2, -3), glm::vec3(0, 3, -3));
+    bezier.addSegment(glm::vec3(-2, 4, -3), glm::vec3(-3, 3, -2), glm::vec3(-3, 2, 0));
+    bezier.addSegment(glm::vec3(-3, 1, 2), glm::vec3(-2, 0, 3), glm::vec3(0, 0, 3));
+
     bezier.iterate();
     bezier.buildArcLenTable();
 
     Model minecart("resources/models/minecart/minecart.obj");
-    RailPlacer railPlacer(bezier, "resources/models/rail/rail.obj", 25);
     Animating animater(bezier, minecart, 1.0f);
 
     float cubeVertices[] = {
@@ -268,12 +268,6 @@ int main()
         debugShader.setMat4("model", model);
         debugShader.setMat4("view", view);
         debugShader.setMat4("projection", projection);
-
-        //model
-        minecart.Draw(debugShader);
-
-        //rails
-        //railPlacer.draw(debugShader);
 
         // bezier
         glBindVertexArray(bezierVAO);

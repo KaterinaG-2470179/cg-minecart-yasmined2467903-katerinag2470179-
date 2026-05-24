@@ -1,9 +1,10 @@
 #include <iostream>
 #include "Bezier.h"
 
-Bezier::Bezier(glm::vec3 p0, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, int steps, Bezier::IterationMethod method) : ParamCubeCurve(p0, p1, p2, p3, steps), m_method(method),
-                                                                                                                    m_p0(p0), m_p1(p1), m_p2(p2), m_p3(p3)
-{}
+Bezier::Bezier(glm::vec3 p0, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, int steps, Bezier::IterationMethod method) : ParamCubeCurve(p0, p1, p2, p3, steps), m_method(method)
+{
+    m_segments.push_back({ p0, p1, p2, p3 });
+}
 
 void Bezier::iterate() {
     ClearPoints();
@@ -27,6 +28,7 @@ Bezier::Bezier() : ParamCubeCurve(glm::vec3(), glm::vec3(), glm::vec3(), glm::ve
         -3,  3,  0,  0,
          1,  0,  0,  0
     );
+    m_segments.push_back({ glm::vec3(), glm::vec3(), glm::vec3(), glm::vec3() });
 }
 
 void Bezier::Bruteforce(int steps) {
@@ -118,14 +120,29 @@ float Bezier::GetTotalLen()
 //return the point on bezier curve at a given t
 glm::vec3 Bezier::GetPointAt(float t) 
 {
+    //we need to first sccale our t to the amount of segments our loop has
+    float t_saled = t * m_segments.size();
+
+    //then we calculate in which segment we're working by casting our float to int (0.5 -> 0) and save said segment so we can get p0,p1,p2,p3 from it
+    int i = glm::min((int)t_saled, (int)m_segments.size() - 1);
+    Segment& curr_seg = m_segments[i];
+
+    //then we get the local t withing a segment and use that for caluclating our point
+    float local_t = t_saled - i;
+
     //our bezier curve is built up of 4 points, meaning that we work with a cubic bezier curve
     //we use the corresponding formula for said curve to calculate the point at a given t
     //formula: https://www.mathwords.com/b/bezier_curve.htm 
+    float x = 1.0f - local_t; //we use this instead of repeatedly writing (1 - t)
 
-    float x = 1.0f - t; //we use this instead of repeatedly writing (1 - t)
+    return x * x * x * curr_seg.p0 +                     // part with P0
+            3 * x * x * local_t * curr_seg.p1 +          // part with P1
+            3 * x * local_t * local_t * curr_seg.p2 +    // part with P2
+           local_t * local_t * local_t * curr_seg.p3;    // part with P3
+}
 
-    return x * x * x * m_p0 +           // part with P0
-            3 * x * x * t * m_p1 +      // part with P1
-            3 * x * t * t * m_p2 +      // part with P2
-           t * t * t * m_p3;            // part with P3
+void Bezier::addSegment(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
+{
+    glm::vec3 p0 = m_segments.back().p3;        //if we add a new segment to our bezier loop, we need to make sure that our the endpoint of our previous segment is the begin point of our new one
+    m_segments.push_back({ p0, p1, p2, p3 });
 }
